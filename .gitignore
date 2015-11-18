@@ -1,0 +1,16 @@
+logs
+*.log
+
+pids
+*.pid
+*.seed
+
+build
+node_modules
+*.db
+
+# Users Environment Variables
+.lock-wscript
+
+# Runtime configuration for swagger app
+config/runtime.yaml

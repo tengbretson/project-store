@@ -1,0 +1,266 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Devolvix Store
+host: localhost:10010
+basePath: /
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /project:
+    x-swagger-router-controller: project
+    get:
+      description: Returns the projects that are available
+      operationId: getProjects
+      parameters:
+        - name: name
+          in: query
+          description: |
+            An optional project name
+            All matching projects will be returned
+          required: false
+          type: string
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Project"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Creates a new project and returns its location
+      operationId: createProject
+      parameters:
+        - name: properties
+          in: body
+          description: A common name used to reference the project
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+      responses:
+        201:
+          description: Success
+          headers:
+            Location:
+              description: The URI for the created project
+              type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /project/{id}:
+    x-swagger-router-controller: project
+    get:
+      description: Returns the available projects that are available
+      operationId: getProject
+      parameters:
+        - name: id
+          in: path
+          description: The project's unique id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Project"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      description: Updates the the contents of the quest specified by id
+      operationId: updateProject
+      parameters:
+        - name: id
+          in: path
+          description: The project's unique id
+          required: true
+          type: integer
+        - name: properties
+          in: body
+          description: The properties to modify in our stored project
+          required: true
+          schema:
+            $ref: "#/definitions/ProjectUpdate"
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      description: Deletes the quest specified by id
+      operationId: deleteProject
+      parameters:
+        - name: id
+          in: path
+          description: The project's unique id
+          required: true
+          type: integer
+      responses:
+        "204":
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /project/{id}/simulation:
+    x-swagger-router-controller: simulation
+    post:
+      description: Creates a new simulation and returns its location
+      operationId: createSimulation
+      parameters:
+        - name: id
+          in: path
+          description: The owning project's unique id
+          required: true
+          type: integer
+      responses:
+        201:
+          description: Success
+          headers:
+            Location:
+              description: The URI for the created simulation
+              type: string
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    get:
+      description: Returns a list of simulations belonging to the project
+      operationId: getSimulations
+      parameters:
+        - name: id
+          in: path
+          description: The id of the project to search for simulations
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Simulation"
+  /simulation/{id}:
+    x-swagger-router-controller: simulation
+    get:
+      description: Returns the simulation described by unique id
+      operationId: getSimulation
+      parameters:
+        - name: id
+          in: path
+          description: The simulation's unique id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: "#/definitions/Simulation"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      description: Deletes the simulation described by the unique id
+      operationId: deleteSimulation
+      parameters:
+        - name: id
+          in: path
+          description: The simulation's unique id
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      description: Updates the simulation's properties
+      operationId: updateSimulation
+      parameters:
+        - name: id
+          in: path
+          description: The simulation's unique id
+          required: true
+          type: integer
+        - name: properties
+          in: body
+          description: The properties of the simulation to update
+          required: true
+          schema:
+            $ref: "#/definitions/SimulationUpdate"
+      responses:
+        204:
+          description: Success
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+definitions:
+  ProjectUpdate:
+    additionalProperties: false
+    properties:
+      name:
+        type: string
+      source:
+        type: string
+  Project:
+    required:
+      - name
+      - id
+      - source
+    properties:
+      name:
+        type: string
+      id:
+        type: integer
+      source:
+        type: string
+  SimulationUpdate:
+    additionalProperties: false
+    properties:
+      annotation:
+        type: string
+  Simulation:
+    required:
+      - id
+      - source
+      - annotation
+      - simulated_on
+      - project
+    properties:
+      id:
+        type: integer
+      source:
+        type: string
+      annotation:
+        type: string
+      simulated_on:
+        type: string
+        format: date-time
+      project:
+        type: integer
+  Error:
+    required:
+      - message
+    properties:
+      message:
+        type: string
